@@ -14,32 +14,29 @@ jobs:
     runs-on: ubuntu-latest
 
     permissions:
-      contents: write   # needed to push the new version tag back to the repo
+      contents: write
       packages: write
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # needed so we can read all existing tags
+          fetch-depth: 0
 
       - name: Determine next version
         id: version
         run: |
-          # Get the latest semver tag, default to v0.0.0 if none exist
           LATEST=$(git tag --list 'v*.*.*' | sort -V | tail -n1)
           if [ -z "$LATEST" ]; then
             LATEST="v0.0.0"
           fi
           echo "Latest tag: $LATEST"
 
-          # Strip the leading 'v' and split into parts
           VERSION="${LATEST#v}"
           MAJOR=$(echo "$VERSION" | cut -d. -f1)
           MINOR=$(echo "$VERSION" | cut -d. -f2)
           PATCH=$(echo "$VERSION" | cut -d. -f3)
 
-          # Bump patch
           PATCH=$((PATCH + 1))
           NEXT="v${MAJOR}.${MINOR}.${PATCH}"
           echo "Next version: $NEXT"
@@ -78,3 +75,21 @@ jobs:
             org.opencontainers.image.revision=${{ github.sha }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.version.outputs.next }}
+          name: ${{ steps.version.outputs.next }}
+          body: |
+            ## Docker Image
+
+            Pull the latest:
+            ```
+            docker pull ghcr.io/${{ github.repository }}:latest
+            ```
+
+            Pull this specific version:
+            ```
+            docker pull ghcr.io/${{ github.repository }}:${{ steps.version.outputs.next_plain }}
+            ```
