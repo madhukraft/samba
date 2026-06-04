@@ -2,12 +2,6 @@
 
 Samba file server in a Docker container. Manages user creation automatically via environment variables.
 
-## Quick Start
-
-```bash
-docker pull ghcr.io/madhukraft/samba:latest
-```
-
 ## Docker Compose
 
 Copy the template below into a `docker-compose.yml` file.
@@ -40,16 +34,6 @@ Your host directories are mapped into the container under `/mnt/`. The `smb.conf
 
 For example, if you map `./share1:/mnt/share1`, you set `path = /mnt/share1` in your `smb.conf`. You can place the host directories anywhere on your system, they just need to be mounted somewhere under `/mnt/` inside the container.
 
-## Users
-
-Users are created automatically at container startup. Set `user_count` to the number of users, then provide a matching `userN` and `passwordN` for each:
-
-| Variable | Description |
-|---|---|
-| `user_count` | Total number of users to create |
-| `user1`, `user2`, ... | Username |
-| `password1`, `password2`, ... | Password for the corresponding user |
-
 ## smb.conf
 
 Create a `smb.conf` file in the same directory as the `docker-compose.yml` file. Here's a minimal template to get started:
@@ -81,15 +65,6 @@ path = /mnt/share2
 valid users = john admin
 write list = john admin
 ```
-
-### Share options
-
-| Option | Description |
-|---|---|
-| `path` | Path inside the container (must be under `/mnt/`) |
-| `valid users` | Space-separated list of users who can access the share |
-| `write list` | Users who can write (others get read-only) |
-| `read only = yes` | Make the entire share read-only regardless of `write list` |
 
 ## Running the container
 
