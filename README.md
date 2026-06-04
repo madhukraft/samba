@@ -55,12 +55,12 @@ logging = file
 # smb encrypt = required
 # server signing = mandatory
 
-[Admin Share]
+[Admin_Share]
 path = /mnt/share1
 valid users = admin
 write list = admin
 
-[My Media]
+[My_Media]
 path = /mnt/share2
 valid users = john admin
 write list = john admin
@@ -79,3 +79,5 @@ docker compose up -d
 **macOS:** Right click on Finder → Connect to Server → `smb://<your-server-ip>/Share Name`
 
 **Windows:** Open File Explorer and navigate to `\\<your-server-ip>\Share Name`
+
+> `Share Name` is the section heading from your `smb.conf` (e.g. `Admin_Share`, `My_Media`)
