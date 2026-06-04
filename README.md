@@ -10,7 +10,7 @@ docker pull ghcr.io/madhukraft/samba:latest
 
 ## Docker Compose
 
-Copy the file below and paste the contents into a docker-compose.yml file.
+Copy the template below into a `docker-compose.yml` file.
 
 ```yaml
 services:
@@ -23,7 +23,7 @@ services:
       - 139:139
     volumes:
       - ./smb.conf:/etc/samba/smb.conf
-      - ./share1:/mnt/share1
+      - ./share1:/mnt/share1 # change ./share1 to the path of the folder you want to share
       - ./share2:/mnt/share2
     environment:
       - user_count=2
@@ -52,7 +52,7 @@ Users are created automatically at container startup. Set `user_count` to the nu
 
 ## smb.conf
 
-Create a samba configuraiton file called smb.conf in the same directory as the docker-compose.yml file. Here's a minimal template to get started:
+Create a `smb.conf` file in the same directory as the `docker-compose.yml` file. Here's a minimal template to get started:
 
 ```ini
 [global]
@@ -90,6 +90,12 @@ write list = john admin
 | `valid users` | Space-separated list of users who can access the share |
 | `write list` | Users who can write (others get read-only) |
 | `read only = yes` | Make the entire share read-only regardless of `write list` |
+
+## Running the container
+
+```bash
+docker compose up -d
+```
 
 ## Connecting
 
