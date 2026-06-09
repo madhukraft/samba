@@ -1,4 +1,6 @@
-FROM alpine:latest
+FROM alpine:3.21.3
+RUN apk add --no-cache samba
 COPY create-users.sh /create-users.sh
-RUN apk add --no-cache samba samba-common-tools && chmod +x /create-users.sh
-CMD ["sh", "-c", "sh /create-users.sh && chmod -R 777 /mnt && sleep infinity"]
+RUN chmod 500 /create-users.sh
+EXPOSE 139 445
+ENTRYPOINT ["/create-users.sh"]

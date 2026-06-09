@@ -1,6 +1,6 @@
 # Samba in Docker
 
-Samba file server in a Docker container. Manages user creation automatically via environment variables.
+Samba file server in a Docker container. Manages user creation automatically from a passwords folder.
 
 ## Docker Compose
 
@@ -16,23 +16,29 @@ services:
       - 445:445
       - 139:139
     volumes:
+      - ./sambapasswords:/run/secrets
       - ./smb.conf:/etc/samba/smb.conf
       - ./share1:/mnt/share1 # change ./share1 to the path of the folder you want to share
       - ./share2:/mnt/share2
-    environment:
-      - user_count=2
-      - user1=admin
-      - password1=changeme
-      - user2=john
-      - password2=changeme
     restart: unless-stopped
 ```
 
-## Volumes & Shares
+## Creating Users
 
-Your host directories are mapped into the container under `/mnt/`. The `smb.conf` file then references those `/mnt/` paths.
+Create a `sambapasswords` folder in the same directory as your `docker-compose.yml`:
 
-For example, if you map `./share1:/mnt/share1`, you set `path = /mnt/share1` in your `smb.conf`. You can place the host directories anywhere on your system, they just need to be mounted somewhere under `/mnt/` inside the container.
+```bash
+mkdir sambapasswords
+chmod 700 sambapasswords
+```
+
+For each user, create a file named after the username containing just their password:
+
+```bash
+echo 'mysecretpassword' > sambapasswords/admin.txt
+echo 'mysecretpassword' > sambapasswords/john.txt
+chmod 600 sambapasswords/*.txt
+```
 
 ## smb.conf
 
@@ -66,6 +72,12 @@ valid users = john admin
 write list = john admin
 ```
 
+## Volumes & Shares
+
+Your host directories are mapped into the container under a directory like `/mnt/`. The `smb.conf` file then references those `/mnt/` paths.
+
+For example, if you map `./share1:/mnt/share1`, you set `path = /mnt/share1` in your `smb.conf`. You can place the host directories anywhere on your system, they don't need to be mounted under `/mnt/` inside the container but it is good to keep all mounts in that directory.
+
 ## Running the container
 
 ```bash
@@ -74,7 +86,7 @@ docker compose up -d
 
 ## Connecting
 
-**Linux:** Open any file manager and click on the netowrk section → `smb://<your-server-ip>/Share Name`
+**Linux:** Open any file manager and click on the network section → `smb://<your-server-ip>/Share Name`
 
 **macOS:** Right click on Finder → Connect to Server → `smb://<your-server-ip>/Share Name`
 

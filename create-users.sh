@@ -1,9 +1,14 @@
-#!/bin/bash
-for i in $(seq 1 "${user_count}")
-do
-eval user=\$user$i
-eval password=\$password$i
-adduser --disabled-password "$user"
-(echo $password; echo $password) | smbpasswd -a $user
+#!/bin/sh
+set -euo pipefail
+
+for secret in /run/secrets/*.txt; do
+  user=$(basename "$secret" .txt)
+  pass=$(cat "$secret")
+
+  [[ "$user" =~ ^[a-zA-Z0-9_]+$ ]] || { echo "Invalid username: $user" >&2; exit 1; }
+
+  adduser --disabled-password --gecos "" "$user"
+  printf '%s\n%s\n' "$pass" "$pass" | smbpasswd -a -s "$user"
 done
-smbd
+
+exec smbd --foreground --no-process-group
