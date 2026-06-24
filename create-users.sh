@@ -7,7 +7,9 @@ for secret in /run/secrets/*.txt; do
 
   [[ "$user" =~ ^[a-zA-Z0-9_]+$ ]] || { echo "Invalid username: $user" >&2; exit 1; }
 
-  adduser --disabled-password --gecos "" "$user"
+  if ! id "$user" &>/dev/null; then
+    adduser --disabled-password --gecos "" "$user"
+  fi
   printf '%s\n%s\n' "$pass" "$pass" | smbpasswd -a -s "$user"
 done
 
